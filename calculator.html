@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Калькулятор семейного бюджета</title>
+    <meta name="description" content="Калькулятор доходов, расходов, накоплений и финансового анализа для семьи.">
+
+    <!-- Сразу применяем сохранённую тему, чтобы страница не мигала светлой -->
+    <script>
+        if (localStorage.getItem("familyBudgetTheme") === "dark") {
+            document.documentElement.classList.add("theme-dark");
+        }
+    </script>
+
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+
+<body>
+
+<header>
+    <div class="container header-content">
+
+        <div>
+            <h1>
+                <a class="brand-link" href="index.html">
+                    💰 Семейный бюджет
+                </a>
+            </h1>
+            <p>Контролируйте доходы, расходы и накопления</p>
+        </div>
+
+        <div class="header-actions">
+
+            <!-- Возврат на приветственную страницу -->
+            <a class="nav-link" href="index.html">
+                На главную
+            </a>
+
+            <button
+                class="btn btn-secondary"
+                onclick="exportData()">
+                📤 Экспорт
+            </button>
+
+            <button
+                class="btn btn-secondary"
+                onclick="document.getElementById('importFile').click()">
+                📥 Импорт
+            </button>
+
+            <input
+                type="file"
+                id="importFile"
+                accept=".json"
+                style="display:none"
+                onchange="importData(event)">
+
+            <button
+                class="btn btn-danger"
+                onclick="clearAll()">
+                🗑 Очистить
+            </button>
+
+        </div>
+    </div>
+</header>
+
+<main>
+    <div class="container">
+
+        <!-- =========================
+             ОСНОВНЫЕ ПОКАЗАТЕЛИ
+        ========================= -->
+
+        <section class="summary-grid">
+
+            <div class="summary-card">
+                <div class="summary-title">Доходы</div>
+                <div id="totalIncome" class="summary-value income-value">
+                    0 ₽
+                </div>
+            </div>
+
+            <div class="summary-card">
+                <div class="summary-title">Расходы</div>
+                <div id="totalExpenses" class="summary-value expense-value">
+                    0 ₽
+                </div>
+            </div>
+
+            <div class="summary-card">
+                <div class="summary-title">Остаток</div>
+                <div id="balance" class="summary-value balance-value">
+                    0 ₽
+                </div>
+            </div>
+
+            <div class="summary-card">
+                <div class="summary-title">Доля накоплений</div>
+                <div id="savingPercent" class="summary-value saving-value">
+                    0%
+                </div>
+            </div>
+
+        </section>
+
+        <div class="layout">
+
+            <!-- =========================
+                 ДОБАВЛЕНИЕ ДОХОДА
+            ========================= -->
+
+            <section class="card">
+
+                <h2>➕ Добавить доход</h2>
+
+                <form id="incomeForm" class="form-grid">
+
+                    <div class="form-group full">
+                        <label for="incomeName">
+                            Название дохода
+                        </label>
+
+                        <input
+                            id="incomeName"
+                            type="text"
+                            placeholder="Например: Зарплата"
+                            required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="incomeAmount">
+                            Сумма, ₽
+                        </label>
+
+                        <input
+                            id="incomeAmount"
+                            type="number"
+                            min="0"
+                            step="0.01"
+                            placeholder="100000"
+                            required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="incomeDate">
+                            Дата
+                        </label>
+
+                        <input
+                            id="incomeDate"
+                            type="date"
+                            required>
+                    </div>
+
+                    <div class="form-actions">
+                        <button
+                            type="submit"
+                            class="btn btn-success">
+                            Добавить доход
+                        </button>
+                    </div>
+
+                </form>
+
+            </section>
+
+            <!-- =========================
+                 ДОБАВЛЕНИЕ РАСХОДА
+            ========================= -->
+
+            <section class="card">
+
+                <h2>➖ Добавить расход</h2>
+
+                <form id="expenseForm" class="form-grid">
+
+                    <div class="form-group full">
+                        <label for="expenseName">
+                            Название расхода
+                        </label>
+
+                        <input
+                            id="expenseName"
+                            type="text"
+                            placeholder="Например: Продукты"
+                            required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="expenseAmount">
+                            Сумма, ₽
+                        </label>
+
+                        <input
+                            id="expenseAmount"
+                            type="number"
+                            min="0"
+                            step="0.01"
+                            placeholder="15000"
+                            required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="expenseCategory">
+                            Категория
+                        </label>
+
+                        <select id="expenseCategory" required>
+                            <option value="Продукты">🛒 Продукты</option>
+                            <option value="Жильё">🏠 Жильё</option>
+                            <option value="Транспорт">🚗 Транспорт</option>
+                            <option value="Коммунальные услуги">
+                                💡 Коммунальные услуги
+                            </option>
+                            <option value="Здоровье">💊 Здоровье</option>
+                            <option value="Одежда">👕 Одежда</option>
+                            <option value="Развлечения">🎬 Развлечения</option>
+                            <option value="Образование">📚 Образование</option>
+                            <option value="Связь">📱 Связь</option>
+                            <option value="Путешествия">✈️ Путешествия</option>
+                            <option value="Другое">📦 Другое</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="expenseDate">
+                            Дата
+                        </label>
+
+                        <input
+                            id="expenseDate"
+                            type="date"
+                            required>
+                    </div>
+
+                    <div class="form-actions">
+                        <button
+                            type="submit"
+                            class="btn btn-danger">
+                            Добавить расход
+                        </button>
+                    </div>
+
+                </form>
+
+            </section>
+
+        </div>
+
+        <!-- =========================
+             ОПЕРАЦИИ
+        ========================= -->
+
+        <section class="card">
+
+            <h2>📋 История операций</h2>
+
+            <div id="transactionList" class="transaction-list">
+                <div class="empty">
+                    Пока нет операций
+                </div>
+            </div>
+
+        </section>
+
+        <div class="layout">
+
+            <!-- =========================
+                 РАСХОДЫ ПО КАТЕГОРИЯМ
+            ========================= -->
+
+            <section class="card">
+
+                <h2>📊 Расходы по категориям</h2>
+
+                <div id="categories"></div>
+
+            </section>
+
+            <!-- =========================
+                 ДИАГРАММА
+            ========================= -->
+
+            <section class="card">
+
+                <h2>🥧 Структура расходов</h2>
+
+                <div class="chart-wrapper">
+                    <canvas
+                        id="expenseChart"
+                        width="300"
+                        height="300">
+                    </canvas>
+                </div>
+
+            </section>
+
+        </div>
+
+        <!-- =========================
+             ЦЕЛЬ НАКОПЛЕНИЙ
+        ========================= -->
+
+        <section class="card">
+
+            <h2>🎯 Цель накоплений</h2>
+
+            <div class="form-grid">
+
+                <div class="form-group">
+                    <label for="goalAmount">
+                        Цель, ₽
+                    </label>
+
+                    <input
+                        id="goalAmount"
+                        type="number"
+                        min="0"
+                        step="100"
+                        placeholder="500000">
+                </div>
+
+                <div class="form-group">
+                    <label for="goalName">
+                        Название цели
+                    </label>
+
+                    <input
+                        id="goalName"
+                        type="text"
+                        placeholder="Например: Первый взнос на квартиру">
+                </div>
+
+                <div class="form-actions">
+                    <button
+                        class="btn btn-primary"
+                        onclick="saveGoal()">
+                        Сохранить цель
+                    </button>
+                </div>
+
+            </div>
+
+            <br>
+
+            <div class="goal-box">
+
+                <div class="goal-values">
+                    <span id="goalTitle">
+                        Цель не установлена
+                    </span>
+
+                    <span id="goalProgressText">
+                        0 ₽ / 0 ₽
+                    </span>
+                </div>
+
+                <div class="progress">
+                    <div
+                        id="goalProgress"
+                        class="progress-bar"
+                        style="width:0%">
+                    </div>
+                </div>
+
+            </div>
+
+        </section>
+
+        <!-- =========================
+             ФИНАНСОВЫЙ АНАЛИЗ
+        ========================= -->
+
+        <section class="card">
+
+            <h2>💡 Финансовый анализ</h2>
+
+            <div
+                id="financialStatus"
+                class="status-box">
+                Добавьте доходы и расходы, чтобы получить анализ.
+            </div>
+
+        </section>
+
+    </div>
+</main>
+
+<footer class="site-footer">
+    <div class="container">
+        Данные сохраняются в браузере · экспорт в JSON в шапке страницы
+    </div>
+</footer>
+
+<!-- Уведомления показываются над кнопкой темы -->
+<div id="toast"></div>
+
+<!--
+    Кнопка смены темы: всегда в правом нижнем углу.
+    Светлая тема → значок луны, тёмная тема → значок солнца.
+-->
+<button
+    type="button"
+    id="themeToggle"
+    class="theme-toggle"
+    onclick="toggleTheme()"
+    title="Переключить тему"
+    aria-label="Переключить тему">
+    🌙
+</button>
+
+<script src="js/theme.js"></script>
+<script src="js/calculator.js"></script>
+
+</body>
+</html>

@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Семейный бюджет — учёт доходов и расходов</title>
+    <meta name="description" content="Простой калькулятор семейного бюджета: доходы, расходы, цели накоплений и анализ. Данные хранятся только в вашем браузере.">
+
+    <!-- Сразу применяем сохранённую тему, чтобы страница не мигала светлой -->
+    <script>
+        if (localStorage.getItem("familyBudgetTheme") === "dark") {
+            document.documentElement.classList.add("theme-dark");
+        }
+    </script>
+
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+
+<body>
+
+<!-- =========================
+     ШАПКА ЛЕНДИНГА
+========================= -->
+<header>
+    <div class="container header-content">
+
+        <div>
+            <h1>
+                <a class="brand-link" href="index.html">
+                    💰 Семейный бюджет
+                </a>
+            </h1>
+            <p>Домашний учёт финансов без регистрации</p>
+        </div>
+
+        <div class="header-actions">
+
+            <!-- Переключение светлой и тёмной темы на лендинге -->
+            <button
+                type="button"
+                id="headerThemeToggle"
+                class="btn btn-secondary"
+                onclick="toggleTheme()"
+                title="Переключить светлую и тёмную тему">
+                🌙 Тёмная тема
+            </button>
+
+            <a class="nav-link" href="calculator.html">
+                Открыть калькулятор
+            </a>
+        </div>
+
+    </div>
+</header>
+
+<main>
+    <div class="container">
+
+        <!-- =========================
+             ПРИВЕТСТВЕННЫЙ БЛОК
+        ========================== -->
+        <section class="landing-hero">
+            <div class="hero-card">
+
+                <span class="hero-kicker">Для семьи</span>
+
+                <h2>Держите доходы, расходы и накопления в одном месте</h2>
+
+                <p class="hero-lead">
+                    Добавляйте операции, смотрите остаток, ставьте цель
+                    и получайте короткий финансовый анализ.
+                    Всё считается сразу, а данные не уходят на сервер.
+                </p>
+
+                <div class="hero-actions">
+                    <a class="btn btn-primary btn-lg" href="calculator.html">
+                        Начать вести бюджет
+                    </a>
+                    <a class="btn btn-secondary btn-lg" href="#features">
+                        Что умеет сервис
+                    </a>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- =========================
+             ВОЗМОЖНОСТИ
+        ========================== -->
+        <section id="features">
+            <div class="features-grid">
+
+                <article class="card">
+                    <div class="feature-icon">➕</div>
+                    <h2>Доходы и расходы</h2>
+                    <p>
+                        Записывайте зарплату, пособия и траты по категориям:
+                        продукты, жильё, транспорт и другие.
+                    </p>
+                </article>
+
+                <article class="card">
+                    <div class="feature-icon">📊</div>
+                    <h2>Картина месяца</h2>
+                    <p>
+                        Сводка, история операций и диаграмма показывают,
+                        куда уходят деньги и сколько остаётся.
+                    </p>
+                </article>
+
+                <article class="card">
+                    <div class="feature-icon">🎯</div>
+                    <h2>Цель накоплений</h2>
+                    <p>
+                        Укажите сумму и название цели — прогресс считается
+                        от текущего остатка после расходов.
+                    </p>
+                </article>
+
+            </div>
+        </section>
+
+        <!-- =========================
+             КАК ЭТО РАБОТАЕТ
+        ========================== -->
+        <section class="card">
+            <h2>Как начать</h2>
+
+            <div class="steps-grid">
+
+                <div>
+                    <div class="step-num">1</div>
+                    <strong>Откройте калькулятор</strong>
+                    <p>Никакой регистрации: страница сразу готова к работе.</p>
+                </div>
+
+                <div>
+                    <div class="step-num">2</div>
+                    <strong>Добавьте операции</strong>
+                    <p>Внесите доходы и расходы — остаток и анализ обновятся сами.</p>
+                </div>
+
+                <div>
+                    <div class="step-num">3</div>
+                    <strong>Сохраните копию</strong>
+                    <p>При необходимости экспортируйте JSON и верните данные импортом.</p>
+                </div>
+
+            </div>
+        </section>
+
+        <p class="privacy-note">
+            Данные хранятся только в вашем браузере (localStorage).
+            Светлая и тёмная тема переключаются кнопкой в правом нижнем углу.
+        </p>
+
+    </div>
+</main>
+
+<footer class="site-footer">
+    <div class="container">
+        Семейный бюджет · учебный проект · работает без сервера
+    </div>
+</footer>
+
+<!--
+    Кнопка смены темы: всегда в правом нижнем углу.
+    Светлая тема → значок луны, тёмная тема → значок солнца.
+-->
+<button
+    type="button"
+    id="themeToggle"
+    class="theme-toggle"
+    onclick="toggleTheme()"
+    title="Переключить тему"
+    aria-label="Переключить тему">
+    🌙
+</button>
+
+<script src="js/theme.js"></script>
+<script>
+/*
+    Дополнительная логика темы только для лендинга:
+    обновляет кнопку в шапке и дублирует переключение,
+    если внешний файл theme.js не загрузился.
+*/
+(function () {
+
+    const THEME_STORAGE_KEY = "familyBudgetTheme";
+
+    function isDarkTheme() {
+        return document.documentElement.classList.contains("theme-dark");
+    }
+
+    function updateLandingButtons() {
+
+        const isDark = isDarkTheme();
+
+        const headerButton =
+            document.getElementById("headerThemeToggle");
+
+        const cornerButton =
+            document.getElementById("themeToggle");
+
+        if (headerButton) {
+            headerButton.textContent =
+                isDark ? "☀️ Светлая тема" : "🌙 Тёмная тема";
+            headerButton.title =
+                isDark
+                    ? "Включить светлую тему"
+                    : "Включить тёмную тему";
+        }
+
+        if (cornerButton) {
+            cornerButton.textContent = isDark ? "☀️" : "🌙";
+            cornerButton.title =
+                isDark
+                    ? "Включить светлую тему"
+                    : "Включить тёмную тему";
+        }
+    }
+
+    window.toggleTheme = function () {
+
+        const nextTheme = isDarkTheme() ? "light" : "dark";
+
+        document.documentElement.classList.toggle(
+            "theme-dark",
+            nextTheme === "dark"
+        );
+
+        localStorage.setItem(THEME_STORAGE_KEY, nextTheme);
+        updateLandingButtons();
+    };
+
+    updateLandingButtons();
+})();
+</script>
+
+</body>
+</html>
